@@ -1,0 +1,4 @@
+<?php
+define("MSG91_AUTH_KEY", "488517TnoIdVbrCqD696a15caP1");
+define("MSG91_TEMPLATE_ID", "696a14d71de15e381401e634");
+?>

@@ -1,0 +1,3 @@
+<?php
+define("FAST2SMS_API_KEY", "deaCgAkrpdRWA3xep0Jh77MpYdLkBfLJaVIIfBDE1Hz8ZF8LBoEZWVlnWHFi");
+?>
