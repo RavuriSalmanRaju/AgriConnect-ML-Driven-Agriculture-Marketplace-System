@@ -13,33 +13,40 @@ if (!isset($_GET['id'])) {
 }
 
 $farmer_id = $_SESSION['farmer_id'];
-$crop_id = $_GET['id'];
+$crop_id = intval($_GET['id']);
 
-// ✅ First: get image path of this crop (only farmer can delete own crop)
-$get = "SELECT crop_image FROM crops WHERE crop_id='$crop_id' AND farmer_id='$farmer_id'";
-$result = $conn->query($get);
+// Get crop details
+$sql = "SELECT * FROM crops
+        WHERE crop_id='$crop_id'
+        AND farmer_id='$farmer_id'";
 
-if ($result->num_rows == 1) {
-    $row = $result->fetch_assoc();
-    $imagePath = "../" . $row['crop_image']; // full server path
+$result = $conn->query($sql);
 
-    // ✅ Delete crop from DB
-    $delete = "DELETE FROM crops WHERE crop_id='$crop_id' AND farmer_id='$farmer_id'";
-    if ($conn->query($delete) === TRUE) {
-
-        // ✅ Delete image file from uploads folder (optional safe delete)
-        if (!empty($row['crop_image']) && file_exists($imagePath)) {
-            unlink($imagePath);
-        }
-
-        header("Location: my_crops.php");
-        exit();
-
-    } else {
-        echo "Delete Error: " . $conn->error;
-    }
-} else {
-    echo "<h3 style='color:red;'>Invalid Crop or Access Denied ❌</h3>";
-    echo "<a href='my_crops.php'>Go Back</a>";
+if ($result->num_rows == 0) {
+    echo "<h3 style='color:red;'>Crop not found or Access Denied ❌</h3>";
+    exit();
 }
+
+$row = $result->fetch_assoc();
+
+// Delete image if exists
+if (!empty($row['crop_image'])) {
+
+    $image = "../uploads/" . basename($row['crop_image']);
+
+    if (file_exists($image)) {
+        unlink($image);
+    }
+
+}
+
+// Delete crop
+$conn->query("
+DELETE FROM crops
+WHERE crop_id='$crop_id'
+AND farmer_id='$farmer_id'
+");
+
+header("Location: my_crops.php?deleted=1");
+exit();
 ?>
